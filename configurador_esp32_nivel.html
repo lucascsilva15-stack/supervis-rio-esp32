@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Configurador ESP32 | Supervisório</title>
+<style>
+:root{color-scheme:dark;--bg:#09121b;--panel:#12202d;--line:#2c4355;--text:#edf5fb;--muted:#9bb0c0;--blue:#42b9ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#193147,#09121b 55%);color:var(--text);font:15px/1.5 system-ui,Segoe UI,sans-serif}header{padding:26px 18px;border-bottom:1px solid var(--line);background:#0a141fe8}header>div,main{max-width:1250px;margin:auto}.eyebrow{color:var(--blue);font-size:11px;font-weight:800;letter-spacing:.16em}.title{font-size:clamp(24px,4vw,36px);font-weight:850}.muted{color:var(--muted)}main{padding:22px 16px 45px}.notice{padding:12px 14px;border:1px solid #7a6129;background:#342a153d;border-radius:10px;margin-bottom:16px;color:#ffe4a0}.grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:16px}.card{background:linear-gradient(150deg,#152635,#101a25);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}.card h2{font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 14px}.field{margin-bottom:12px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}.field input{width:100%;padding:11px;border:1px solid #365064;border-radius:8px;background:#09131d;color:var(--text);font:inherit}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.btn{border:1px solid #3882aa;border-radius:9px;background:#12364d;color:#f2faff;padding:10px 14px;font-weight:800;cursor:pointer}.btn.secondary{border-color:var(--line);background:#1a2a38}pre{white-space:pre;overflow:auto;max-height:70vh;background:#071019;border:1px solid #293f51;border-radius:9px;padding:14px;font:12px/1.55 ui-monospace,Consolas,monospace;color:#d2e8f7;margin:0}.small{font-size:12px;color:var(--muted);margin-top:10px}@media(max-width:800px){.grid{grid-template-columns:1fr}pre{max-height:55vh}}
+</style></head><body>
+<header><div><div class="eyebrow">AUTOMAÇÃO INDUSTRIAL · CONFIGURADOR</div><div class="title">ESP32 — Supervisório de nível de água</div><div class="muted">Preencha os parâmetros e gere as configurações MicroPython.</div></div></header>
+<main><div class="notice"><b>Privacidade:</b> esta página gera o código no seu navegador. Não envia nem salva o Wi-Fi ou a senha. Não publique o código gerado, pois ele contém suas credenciais.</div>
+<div class="grid"><section class="card"><h2>01 / Configuração</h2>
+<div class="field"><label for="ssid">Nome da rede Wi-Fi (SSID)</label><input id="ssid" placeholder="Ex.: MinhaRedeWiFi" autocomplete="off"></div>
+<div class="field"><label for="wifiPass">Senha do Wi-Fi</label><input id="wifiPass" type="password" placeholder="Senha da rede" autocomplete="new-password"></div>
+<div class="field"><label for="broker">Endereço do broker MQTT (hostname ou IP)</label><input id="broker" placeholder="Ex.: 192.168.1.50 ou mqtt.exemplo.com"></div>
+<div class="row"><div class="field"><label for="mqttPort">Porta MQTT do ESP32</label><input id="mqttPort" value="1883" inputmode="numeric"></div><div class="field"><label for="client">Client ID</label><input id="client" value="esp32-nivel-01"></div></div>
+<div class="row"><div class="field"><label for="mqttUser">Usuário MQTT (opcional)</label><input id="mqttUser" placeholder="Vazio se não usar" autocomplete="off"></div><div class="field"><label for="mqttPass">Senha MQTT (opcional)</label><input id="mqttPass" type="password" placeholder="Vazio se não usar" autocomplete="new-password"></div></div>
+<div class="buttons"><button class="btn" id="generate">GERAR CONFIGURAÇÃO</button><button class="btn secondary" id="togglePass">Mostrar senhas</button></div>
+<div class="small">Copie as linhas geradas para a seção de configuração do seu arquivo main.py no Thonny. Não substitua o firmware inteiro por este trecho.</div></section>
+<section class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px"><h2 style="margin:0">02 / Código MicroPython</h2><button class="btn secondary" id="copy">COPIAR CÓDIGO</button></div>
+<pre id="code"># Preencha os campos à esquerda e clique em GERAR CONFIGURAÇÃO.
+WIFI_SSID = ""
+WIFI_SENHA = ""
+BROKER = ""
+BROKER_PORTA = 1883
+MQTT_USUARIO = ""
+MQTT_SENHA = ""
+CLIENT_ID = "esp32-nivel-01"</pre><div class="small" id="message" role="status">Pronto para gerar. Confira os dados antes de copiar para o Thonny.</div></section></div></main>
+<script>
+const $=id=>document.getElementById(id);
+function pyString(s){return "'"+String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/\r/g,"\\r").replace(/\n/g,"\\n")+"'";}
+function generate(){const ssid=$('ssid').value,wp=$('wifiPass').value,broker=$('broker').value.trim(),port=Number($('mqttPort').value),client=$('client').value.trim()||'esp32-nivel-01',user=$('mqttUser').value,pass=$('mqttPass').value;
+if(!ssid||!broker||!Number.isInteger(port)||port<1||port>65535){$('message').textContent='Preencha SSID, broker e uma porta válida (1–65535).';return;}
+$('code').textContent=['# --- CONFIGURAÇÃO GERADA PELO CONFIGURADOR ---','WIFI_SSID = '+pyString(ssid),'WIFI_SENHA = '+pyString(wp),'BROKER = '+pyString(broker),'BROKER_PORTA = '+port,'MQTT_USUARIO = '+pyString(user),'MQTT_SENHA = '+pyString(pass),'CLIENT_ID = '+pyString(client),'# Mantenha os tópicos iguais no firmware e no HTML',"TOPICO_STATUS = b'nivel/esp32-01/status'","TOPICO_ESTADO = b'nivel/esp32-01/estado'","TOPICO_RFID = b'nivel/esp32-01/rfid'"].join('\n');
+$('message').textContent='Configuração gerada. Copie e cole no bloco de configuração do main.py no Thonny.';}
+$('generate').addEventListener('click',generate);
+$('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('code').textContent);$('message').textContent='Código copiado para a área de transferência.';}catch(e){$('message').textContent='Não foi possível copiar automaticamente. Selecione o texto e copie manualmente.';}});
+$('togglePass').addEventListener('click',()=>{const show=$('wifiPass').type==='password';$('wifiPass').type=show?'text':'password';$('mqttPass').type=show?'text':'password';$('togglePass').textContent=show?'Ocultar senhas':'Mostrar senhas';});
+</script></body></html>
